@@ -1,4 +1,4 @@
-# PygameFW beta-0.1
+# PygameFW 0.1-beta
 It's a simple framework for pygame, that includes buttons, scales, sliders and etc.
 
 README-file in progress...
