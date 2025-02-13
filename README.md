@@ -35,7 +35,7 @@ README-file in progress...
 	visible
 
 ### PygameFW.Text()
-####Arguments:
+#### Arguments:
 	id, x, y,
 	font_size, color, value, font,
 	visible
