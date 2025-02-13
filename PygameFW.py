@@ -8,31 +8,6 @@ pygame.init()
 
 
 
-
-def line(x,y,x2,y2,color,width):
-	pygame.draw.line(screen,color,(x,y),(x2,y2),width)
-
-def line_a(x,y,x2,y2,color,width):
-	pygame.draw.aaline(screen,color,(x,y),(x2,y2),width)
-
-def circle(x,y,color,width):
-	pygame.draw.circle(screen,color,(x,y),width)
-
-def rect(x,y,lenght,height,color,width):
-	pygame.draw.rect(screen,color,(x,y,lenght,height),width)
-
-font = [0]*128
-for i in range(2,128):
-	font[i] = pygame.font.Font(None,i)
-
-def textout(x,y,size,color,text):
-	out = font[size].render(text, 1, color)
-	screen.blit(out,(x,y))
-
-
-
-
-
 class Button:
 	def __init__(self,
 		id = None,
