@@ -27,7 +27,8 @@ class Button:
 		icon = None,
 		icon_covered = None,
 		icon_selected = None,
-		visible=True):
+		visible=True
+		):
 
 		if id == None:
 			random.seed(time.time())
@@ -74,13 +75,13 @@ class Button:
 				scr.blit(self.icon,(self.x,self.y))
 			pygame.draw.rect(scr,self.color_border,(self.x, self.y, self.dx, self.dy), self.border_size)
 
-		if mode == 'covered':
+		elif mode == 'covered':
 			pygame.draw.rect(scr,self.color_fill_covered,(self.x, self.y, self.dx, self.dy), 0)
 			if self.icon_covered != None:
 				scr.blit(self.icon_covered,(self.x,self.y))
 			pygame.draw.rect(scr,self.color_border_covered,(self.x, self.y, self.dx, self.dy), self.border_size)
 
-		if mode == 'selected':
+		elif mode == 'selected':
 			pygame.draw.rect(scr,self.color_fill_selected,(self.x, self.y, self.dx, self.dy), 0)
 			if self.icon_selected != None:
 				scr.blit(self.icon_selected,(self.x,self.y))
@@ -109,8 +110,7 @@ class Scale:
 		color_border=(100,100,100),
 		color_fill=(255,255,255),
 		color_filled=(255,140,140),
-		visible=True,
-
+		visible=True
 		):
 
 		if id == None:
@@ -202,8 +202,6 @@ class Slider:
 		color_circle_covered=(255,60,60),
 		color_circle_selected=(255,0,0),
 		visible=True
-
-
 		):
 
 		if id == None:
@@ -288,24 +286,20 @@ class Slider:
 
 
 
-		
 		if mode == 'default':
 			pygame.draw.circle(scr,self.color_circle,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
 			
 			
-		if mode == 'covered':
+		elif mode == 'covered':
 			pygame.draw.circle(scr,self.color_circle_covered,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
 			
 			
-		if mode == 'selected':
+		elif mode == 'selected':
 			pygame.draw.circle(scr,self.color_circle_selected,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
-
-
 
 		return scr
 	
 	
-
 
 	def is_covered(self, mouse_x, mouse_y):
 		
@@ -343,8 +337,6 @@ class Text:
 
 
 		self.visible = visible
-
-
 
 
 	def get_value(self):
@@ -516,15 +508,6 @@ class Controls:
 
 
 
-
-
-		
-
-				
-	
-
-
-
 	def render(self, screen, mouse_touching_l, mouse_touching_r):
 		self.mouse_touching_l = mouse_touching_l
 		self.mouse_touching_r = mouse_touching_r
@@ -549,10 +532,3 @@ class Controls:
 		return self.scr
 
 		
-
-
-
-		
-
-
-
