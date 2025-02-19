@@ -1,8 +1,10 @@
 import pygame
 import random
 import time
+import pyperclip
 
 pygame.init()
+
 
 
 
@@ -67,25 +69,28 @@ class Button:
 
 
 
-	def blit(self, screen, mode='default'):
+	def blit(self, screen):
 		scr = screen
-		if mode == 'default':
-			pygame.draw.rect(scr,self.color_fill,(self.x, self.y, self.dx, self.dy), 0)
-			if self.icon != None:
-				scr.blit(self.icon,(self.x,self.y))
-			pygame.draw.rect(scr,self.color_border,(self.x, self.y, self.dx, self.dy), self.border_size)
-
-		elif mode == 'covered':
+		
+		
+		if self.selected_left or self.selected_right:
+			pygame.draw.rect(scr,self.color_fill_selected,(self.x, self.y, self.dx, self.dy), 0)
+			if self.icon_selected != None:
+				scr.blit(self.icon_selected,(self.x,self.y))
+			pygame.draw.rect(scr,self.color_border_selected,(self.x, self.y, self.dx, self.dy), self.border_size)
+		
+		elif self.covered:
 			pygame.draw.rect(scr,self.color_fill_covered,(self.x, self.y, self.dx, self.dy), 0)
 			if self.icon_covered != None:
 				scr.blit(self.icon_covered,(self.x,self.y))
 			pygame.draw.rect(scr,self.color_border_covered,(self.x, self.y, self.dx, self.dy), self.border_size)
 
-		elif mode == 'selected':
-			pygame.draw.rect(scr,self.color_fill_selected,(self.x, self.y, self.dx, self.dy), 0)
-			if self.icon_selected != None:
-				scr.blit(self.icon_selected,(self.x,self.y))
-			pygame.draw.rect(scr,self.color_border_selected,(self.x, self.y, self.dx, self.dy), self.border_size)
+		else:
+			pygame.draw.rect(scr,self.color_fill,(self.x, self.y, self.dx, self.dy), 0)
+			if self.icon != None:
+				scr.blit(self.icon,(self.x,self.y))
+			pygame.draw.rect(scr,self.color_border,(self.x, self.y, self.dx, self.dy), self.border_size)
+
 
 		return scr
 	
@@ -231,6 +236,11 @@ class Slider:
 
 		self.visible = visible
 
+		self.add_x_circle = 0
+		self.add_y_circle = 0
+
+		
+
 
 	def get_value(self):
 		return self.value
@@ -253,7 +263,7 @@ class Slider:
 		return self.value
 
 
-	def blit(self, screen, mode):
+	def blit(self, screen):
 		scr = screen
 		pygame.draw.rect(scr,self.color_fill,(self.x, self.y, self.dx, self.dy), 0)
 
@@ -277,6 +287,7 @@ class Slider:
 			self.add_y = self.dy-self.dy*self.k
 			self.add_x_circle = self.dx//2
 			self.add_y_circle = self.dy-self.dy*self.k
+		
 
 
 		pygame.draw.rect(scr,self.color_filled,(self.x, self.y+self.add_y, self.dx*self.k_x, self.dy*self.k_y), 0)
@@ -286,16 +297,13 @@ class Slider:
 
 
 
-		if mode == 'default':
+		if self.selected:
+			pygame.draw.circle(scr,self.color_circle_selected,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
+		elif self.covered:
+			pygame.draw.circle(scr,self.color_circle_covered,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
+		else:
 			pygame.draw.circle(scr,self.color_circle,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
 			
-			
-		elif mode == 'covered':
-			pygame.draw.circle(scr,self.color_circle_covered,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
-			
-			
-		elif mode == 'selected':
-			pygame.draw.circle(scr,self.color_circle_selected,(self.x+self.add_x_circle, self.y+self.add_y_circle), self.circle_size)
 
 		return scr
 	
@@ -314,7 +322,7 @@ class Text:
 		font_size=24,
 		color=(0,0,0),
 		value='',
-		font=None,
+		font='PygameFW/PgFW_font.ttf',
 		visible=True
 		):
 
@@ -359,6 +367,117 @@ class Text:
 
 
 
+class InputBox_Line:
+	def __init__(self,
+		id = None,
+		x = 0,
+		y = 0,
+		dx = 500,
+		dy = 200,
+		font_color=(0,0,0),
+		value='',
+		font='PygameFW/PgFW_font.ttf',
+		border_size = 3,
+		color_border = (100,100,100),
+		color_border_covered = (210,80,80),
+		color_border_selected = (255,0,0),
+		color_fill = (255,255,255),
+		color_fill_covered = (220,180,180),
+		color_fill_selected = (255,140,140),
+		visible=True
+		):
+
+
+		if id == None:
+			random.seed(time.time())
+			id = str(random.randint(10000000,99999999))
+		self.id = id
+
+		self.x = x
+		self.y = y
+		self.dx = dx
+		self.dy = dy
+		self.font_color = font_color
+		self.value = value
+		self.len_max = int(dx/dy*2.19)
+		self.font = font
+		self.border_size = border_size
+		self.color_border = color_border
+		self.color_border_covered = color_border_covered
+		self.color_border_selected = color_border_selected
+		self.color_fill = color_fill
+		self.color_fill_covered = color_fill_covered
+		self.color_fill_selected = color_fill_selected
+
+		self.pointer = 0
+
+		self.visible = visible
+
+		self.covered = False
+		self.selected = False
+
+		self.font_size = int(dy*0.75)
+
+		self.dyt = dy*0.0
+		self.dxt = dy*0.2
+
+		self.fontt = [0]*128
+		for i in range(2,128):
+			self.fontt[i] = pygame.font.Font(font,i)
+
+		self.counter = 0
+
+
+
+	def get_value(self):
+		return self.value
+
+	def set_value(self, value):
+		self.value = value
+
+		return self.value
+
+
+	def blit(self, screen):
+		scr = screen
+		
+		
+		if self.selected:
+			pygame.draw.rect(scr,self.color_fill_selected,(self.x, self.y, self.dx, self.dy), 0)
+			pygame.draw.rect(scr,self.color_border_selected,(self.x, self.y, self.dx, self.dy), self.border_size)
+			
+
+		elif self.covered:
+			pygame.draw.rect(scr,self.color_fill_covered,(self.x, self.y, self.dx, self.dy), 0)
+			pygame.draw.rect(scr,self.color_border_covered,(self.x, self.y, self.dx, self.dy), self.border_size)
+
+		else:
+			pygame.draw.rect(scr,self.color_fill,(self.x, self.y, self.dx, self.dy), 0)
+			pygame.draw.rect(scr,self.color_border,(self.x, self.y, self.dx, self.dy), self.border_size)
+
+		out = self.fontt[self.font_size].render(str(self.value), 1, self.font_color)
+		screen.blit(out,(self.x + self.dxt, self.y + self.dyt))
+
+		if self.counter > 20 and self.selected:
+			pygame.draw.rect(scr,self.font_color,(self.x + self.font_size*self.pointer*0.598+self.dxt, self.y + self.dy*0.1, 2, self.dy*0.8), 1)
+
+		self.counter += 1
+		if self.counter > 40:
+			self.counter = 0
+
+		return scr
+
+
+	def is_covered(self, mouse_x, mouse_y):
+		return mouse_x > self.x and mouse_x < self.x + self.dx and mouse_y > self.y and mouse_y < self.y + self.dy
+
+
+
+
+
+
+
+
 class Controls:
 	def __init__(self, objs=dict()):
 		self.objs = objs
@@ -377,6 +496,9 @@ class Controls:
 
 		self.mouse_x_l = 0
 		self.mouse_y_l = 0
+
+		self.k_ctrl = False
+
 
 
 	def add(self, objs):
@@ -400,35 +522,69 @@ class Controls:
 		self.objs[obj.id].visible = False
 
 
+	
 
-	def do_logic(self):
+
+
+	def events(self, event):
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_LCTRL:
+				self.k_ctrl = True
+
+
+
+		if event.type == pygame.KEYUP:
+			if event.key == pygame.K_LCTRL:
+				self.k_ctrl = False
+
+
+
+
+
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if event.button == 1:
+				self.mouse_touching_l = True
+				
+
+			if event.button == 3:
+				self.mouse_touching_r = True
+		elif event.type == pygame.MOUSEBUTTONUP:
+			if event.button == 1:
+				self.mouse_touching_l = False
+				
+
+			if event.button == 3:
+				self.mouse_touching_r = False
+
+		
+		mouse_pos = pygame.mouse.get_pos()
+
+		self.mouse_x_l = self.mouse_x
+		self.mouse_y_l = self.mouse_y
+
+		self.mouse_x = mouse_pos[0]
+		self.mouse_y = mouse_pos[1]
+
 		for obj_id, obj in self.objs.items():
 			if obj.visible:
-				if type(self.objs[obj_id]) == Button:
-					if self.objs[obj_id].mode == 'one_touch':
+				if type(obj) == Button:
+					if obj.mode == 'one_touch':
 						self.objs[obj_id].selected_left = False
 						self.objs[obj_id].selected_right = False
 
-					if self.objs[obj_id].selected_left or self.objs[obj_id].selected_right:
-						self.scr = self.objs[obj_id].blit(self.scr, 'selected')
-					elif self.objs[obj_id].covered:
-						self.scr = self.objs[obj_id].blit(self.scr, 'covered')
-					else:
-						self.scr = self.objs[obj_id].blit(self.scr, 'default')
-
-					if self.objs[obj_id].is_covered(self.mouse_x, self.mouse_y):
+					if obj.is_covered(self.mouse_x, self.mouse_y):
 						self.objs[obj_id].covered = True
 						if self.mouse_touching_l:
-							if self.objs[obj_id].mode == 'push':
+							if obj.mode == 'push':
 									self.objs[obj_id].selected_left = True
-							elif self.objs[obj_id].mode == 'toggle':
+							elif obj.mode == 'toggle':
 								
 								if not self.mouse_touching_l_lock:
 									self.objs[obj_id].selected_left ^= 1
 									self.mouse_touching_l_lock = True
 								self.mouse_touching_l_last = self.mouse_touching_l
 
-							elif self.objs[obj_id].mode == 'one_touch':
+							elif obj.mode == 'one_touch':
 								if not self.mouse_touching_l_lock:
 									self.objs[obj_id].selected_left = True
 									self.mouse_touching_l_lock = True
@@ -437,22 +593,22 @@ class Controls:
 						else:
 							if self.mouse_touching_l_last != self.mouse_touching_l:
 								self.mouse_touching_l_lock = False
-							if self.objs[obj_id].mode == 'push':
+							if obj.mode == 'push':
 								self.objs[obj_id].selected_left = False
 
 
 
 						if self.mouse_touching_r:
-							if self.objs[obj_id].mode == 'push':
+							if obj.mode == 'push':
 									self.objs[obj_id].selected_right = True
-							elif self.objs[obj_id].mode == 'toggle':
+							elif obj.mode == 'toggle':
 								
 								if not self.mouse_touching_r_lock:
 									self.objs[obj_id].selected_right ^= 1
 									self.mouse_touching_r_lock = True
 								self.mouse_touching_r_last = self.mouse_touching_r
 
-							elif self.objs[obj_id].mode == 'one_touch':
+							elif obj.mode == 'one_touch':
 								if not self.mouse_touching_r_lock:
 									self.objs[obj_id].selected_right = True
 									self.mouse_touching_r_lock = True
@@ -466,25 +622,15 @@ class Controls:
 
 					else:
 						self.objs[obj_id].covered = False
-						if not self.objs[obj_id].mode == 'toggle':
+						if not obj.mode == 'toggle':
 							self.objs[obj_id].selected_left = False
 							self.objs[obj_id].selected_right = False
 
 
 
-				elif type(self.objs[obj_id]) == Scale:
-					self.scr = self.objs[obj_id].blit(self.scr)
+				elif type(obj) == Slider:
 
-				elif type(self.objs[obj_id]) == Slider:
-					if self.objs[obj_id].selected:
-						self.scr = self.objs[obj_id].blit(self.scr, 'selected')
-					elif self.objs[obj_id].covered:
-						self.scr = self.objs[obj_id].blit(self.scr, 'covered')
-					else:
-						self.scr = self.objs[obj_id].blit(self.scr, 'default')
-
-
-					if self.objs[obj_id].is_covered(self.mouse_x, self.mouse_y):
+					if obj.is_covered(self.mouse_x, self.mouse_y):
 						self.objs[obj_id].covered = True
 						if self.mouse_touching_l:
 							self.objs[obj_id].selected = True
@@ -494,38 +640,90 @@ class Controls:
 					else:
 						self.objs[obj_id].covered = False
 
-					if self.mouse_touching_l and self.objs[obj_id].selected:
-						if self.objs[obj_id].direction == 'right':
-							add_value = (self.mouse_x-self.mouse_x_l)*(self.objs[obj_id].value_max/self.objs[obj_id].dx)
-						elif  self.objs[obj_id].direction == 'up':
-							add_value = -(self.mouse_y-self.mouse_y_l)*(self.objs[obj_id].value_max/self.objs[obj_id].dy)
+					if self.mouse_touching_l and obj.selected:
+						if obj.direction == 'right':
+							add_value = (self.mouse_x-self.mouse_x_l)*(obj.value_max/obj.dx)
+						elif obj.direction == 'up':
+							add_value = -(self.mouse_y-self.mouse_y_l)*(obj.value_max/obj.dy)
 						self.objs[obj_id].add_value(add_value)
 					else:
 						self.objs[obj_id].selected = False
 
-				elif type(self.objs[obj_id]) == Text:
-					self.scr = self.objs[obj_id].blit(self.scr)
+
+				elif type(obj) == InputBox_Line:
 
 
+					if obj.is_covered(self.mouse_x, self.mouse_y):
+						self.objs[obj_id].covered = True
+						if self.mouse_touching_l:	
+							self.objs[obj_id].selected = True
 
-	def render(self, screen, mouse_touching_l, mouse_touching_r):
-		self.mouse_touching_l = mouse_touching_l
-		self.mouse_touching_r = mouse_touching_r
+						else:
+							if self.mouse_touching_l_last != self.mouse_touching_l:
+								self.mouse_touching_l_lock = False
 
-		action = None
+					else:
+						self.objs[obj_id].covered = False
+						if self.mouse_touching_l:
+							self.objs[obj_id].selected = False
+
+
+					if obj.selected:
+						if event.type == pygame.KEYDOWN:
+							symbol = event.unicode
+							val = obj.value
+
+							if event.key == pygame.K_BACKSPACE:
+								if len(val) > 0 and obj.pointer > 0:
+									self.objs[obj_id].value = val[:obj.pointer-1] + val[obj.pointer:]
+									obj.pointer -= 1
+
+							elif event.key == pygame.K_LEFT:
+								if obj.pointer > 0:
+									obj.pointer -= 1
+
+							elif event.key == pygame.K_RIGHT:
+								if obj.pointer < len(obj.value):
+									obj.pointer += 1
+
+
+							elif self.k_ctrl:
+								if event.key == pygame.K_c:
+									pyperclip.copy(val)
+								elif event.key == pygame.K_x:
+									pyperclip.copy(val)
+									self.objs[obj_id].value = ''
+									obj.pointer = 0
+								elif event.key == pygame.K_v:
+									self.objs[obj_id].value += pyperclip.paste()
+									self.objs[obj_id].value = obj.value[:obj.len_max]
+									obj.pointer += len(pyperclip.paste())
+
+							elif not(event.key == pygame.K_RETURN or
+								   event.key == pygame.K_ESCAPE or
+								   event.key == pygame.K_TAB or
+								   event.key == pygame.K_BACKSPACE or
+								   event.key == pygame.K_LSHIFT) and not(self.k_ctrl):
+								if len(val) < obj.len_max:
+									self.objs[obj_id].value = val[:obj.pointer] + symbol + val[obj.pointer:]
+									obj.pointer += 1
+
+									
+							
+
+
+							
+
+
+	def render(self, screen):
 		self.scr = screen
 
-		mouse_pos = pygame.mouse.get_pos()
 
-		self.mouse_x_l = self.mouse_x
-		self.mouse_y_l = self.mouse_y
-
-		self.mouse_x = mouse_pos[0]
-		self.mouse_y = mouse_pos[1]
+		for obj_id, obj in self.objs.items():
+			if obj.visible:
+				self.scr = self.objs[obj_id].blit(self.scr)
 
 
-
-		self.do_logic()
 		pygame.display.flip()
 			
 
