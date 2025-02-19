@@ -399,7 +399,7 @@ class InputBox_Line:
 		self.dy = dy
 		self.font_color = font_color
 		self.value = value
-		self.len_max = int(dx/dy*2.19)
+		self.len_max = int(dx/dy*2.22)
 		self.font = font
 		self.border_size = border_size
 		self.color_border = color_border
@@ -426,6 +426,8 @@ class InputBox_Line:
 			self.fontt[i] = pygame.font.Font(font,i)
 
 		self.counter = 0
+
+
 
 
 
@@ -459,7 +461,7 @@ class InputBox_Line:
 		screen.blit(out,(self.x + self.dxt, self.y + self.dyt))
 
 		if self.counter > 20 and self.selected:
-			pygame.draw.rect(scr,self.font_color,(self.x + self.font_size*self.pointer*0.598+self.dxt, self.y + self.dy*0.1, 2, self.dy*0.8), 1)
+			pygame.draw.rect(scr,self.font_color,(self.x + self.font_size*self.pointer*0.5952+self.dxt, self.y + self.dy*0.1, 2, self.dy*0.8), 1)
 
 		self.counter += 1
 		if self.counter > 40:
@@ -470,11 +472,6 @@ class InputBox_Line:
 
 	def is_covered(self, mouse_x, mouse_y):
 		return mouse_x > self.x and mouse_x < self.x + self.dx and mouse_y > self.y and mouse_y < self.y + self.dy
-
-
-
-
-
 
 
 
